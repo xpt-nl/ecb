@@ -22,45 +22,78 @@ import (
 // https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml
 // https://www.ecb.europa.eu/stats/eurofxref/eurofxref-sdmx.xml
 
-type Symbol string
-
 const (
-	USD Symbol = "USD"
-	JPY Symbol = "JPY"
-	BGN Symbol = "BGN"
-	CZK Symbol = "CZK"
-	DKK Symbol = "DKK"
-	GBP Symbol = "GBP"
-	HUF Symbol = "HUF"
-	PLN Symbol = "PLN"
-	RON Symbol = "RON"
-	SEK Symbol = "SEK"
-	CHF Symbol = "CHF"
-	ISK Symbol = "ISK"
-	NOK Symbol = "NOK"
-	HRK Symbol = "HRK"
-	RUB Symbol = "RUB"
-	TRY Symbol = "TRY"
-	AUD Symbol = "AUD"
-	BRL Symbol = "BRL"
-	CAD Symbol = "CAD"
-	CNY Symbol = "CNY"
-	HKD Symbol = "HKD"
-	IDR Symbol = "IDR"
-	ILS Symbol = "ILS"
-	INR Symbol = "INR"
-	KRW Symbol = "KRW"
-	MXN Symbol = "MXN"
-	MYR Symbol = "MYR"
-	NZD Symbol = "NZD"
-	PHP Symbol = "PHP"
-	SGD Symbol = "SGD"
-	THB Symbol = "THB"
-	ZAR Symbol = "ZAR"
+	USD = "USD"
+	JPY = "JPY"
+	BGN = "BGN"
+	CZK = "CZK"
+	DKK = "DKK"
+	GBP = "GBP"
+	HUF = "HUF"
+	PLN = "PLN"
+	RON = "RON"
+	SEK = "SEK"
+	CHF = "CHF"
+	ISK = "ISK"
+	NOK = "NOK"
+	HRK = "HRK"
+	RUB = "RUB"
+	TRY = "TRY"
+	AUD = "AUD"
+	BRL = "BRL"
+	CAD = "CAD"
+	CNY = "CNY"
+	HKD = "HKD"
+	IDR = "IDR"
+	ILS = "ILS"
+	INR = "INR"
+	KRW = "KRW"
+	MXN = "MXN"
+	MYR = "MYR"
+	NZD = "NZD"
+	PHP = "PHP"
+	SGD = "SGD"
+	THB = "THB"
+	ZAR = "ZAR"
 )
 
+var Currencies = []string{
+	USD,
+	JPY,
+	BGN,
+	CZK,
+	DKK,
+	GBP,
+	HUF,
+	PLN,
+	RON,
+	SEK,
+	CHF,
+	ISK,
+	NOK,
+	HRK,
+	RUB,
+	TRY,
+	AUD,
+	BRL,
+	CAD,
+	CNY,
+	HKD,
+	IDR,
+	ILS,
+	INR,
+	KRW,
+	MXN,
+	MYR,
+	NZD,
+	PHP,
+	SGD,
+	THB,
+	ZAR,
+}
+
 // EUR returns the rate of the Euro denominated in the currency passed in as an argument.
-func EUR(symbol Symbol) (rate float64, err error) {
+func EUR(symbol string) (rate float64, err error) {
 	response, err := http.Get("https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml")
 	if err != nil {
 		return 0.0, err
@@ -83,7 +116,7 @@ func EUR(symbol Symbol) (rate float64, err error) {
 }
 
 // Rates returns all the rates of the Euro denominated in other currencies.
-func Rates() (rates map[Symbol]float64, err error) {
+func EuroRates() (rates map[string]float64, err error) {
 	response, err := http.Get("https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml")
 	if err != nil {
 		return nil, err
@@ -94,7 +127,7 @@ func Rates() (rates map[Symbol]float64, err error) {
 		return nil, err
 	}
 
-	rates = make(map[Symbol]float64)
+	rates = make(map[string]float64)
 	for _, currency := range daily.Rates[0].Currencies {
 		cr, err := decimal.NewFromString(currency.Rate)
 		if err != nil {
@@ -116,7 +149,7 @@ type rate struct {
 }
 
 type currency struct {
-	Symbol Symbol `xml:"currency,attr"`
+	Symbol string `xml:"currency,attr"`
 	Rate   string `xml:"rate,attr"`
 }
 
