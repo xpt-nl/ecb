@@ -10,7 +10,7 @@ import (
 func TestExchangeRate(t *testing.T) {
 	rate, err := ecb.EUR(ecb.USD)
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 	log.Println(rate)
 }

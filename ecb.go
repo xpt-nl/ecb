@@ -14,6 +14,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/shopspring/decimal"
 )
@@ -94,17 +95,24 @@ var Currencies = []string{
 
 // EUR returns the rate of the Euro denominated in the currency passed in as an argument.
 func EUR(symbol string) (rate float64, err error) {
+	daily := daily{}
 	response, err := http.Get("https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml")
 	if err != nil {
 		return 0.0, err
 	}
 	defer response.Body.Close()
-	daily := daily{}
 	if err := xml.NewDecoder(response.Body).Decode(&daily); err != nil {
-		return 0.0, err
+		// fallback to file when response of ECB is unintelligible
+		file, err := os.Open("eurofxref-daily.xml")
+		if err != nil {
+			return 0.0, err
+		}
+		defer file.Close()
+		if err := xml.NewDecoder(file).Decode(&daily); err != nil {
+			return 0.0, err
+		}
 	}
 
-	// log.Println(daily.Rates[0].Time)
 	for _, currency := range daily.Rates[0].Currencies {
 		if currency.Symbol == symbol {
 			cr, err := decimal.NewFromString(currency.Rate)
@@ -117,14 +125,22 @@ func EUR(symbol string) (rate float64, err error) {
 
 // Rates returns all the rates of the Euro denominated in other currencies.
 func EuroRates() (rates map[string]float64, err error) {
+	daily := daily{}
 	response, err := http.Get("https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml")
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
-	daily := daily{}
 	if err := xml.NewDecoder(response.Body).Decode(&daily); err != nil {
-		return nil, err
+		// fallback to file when response of ECB is unintelligible
+		file, err := os.Open("eurofxref-daily.xml")
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+		if err := xml.NewDecoder(file).Decode(&daily); err != nil {
+			return nil, err
+		}
 	}
 
 	rates = make(map[string]float64)
