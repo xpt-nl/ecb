@@ -37,8 +37,6 @@ const (
 	CHF = "CHF"
 	ISK = "ISK"
 	NOK = "NOK"
-	HRK = "HRK"
-	RUB = "RUB"
 	TRY = "TRY"
 	AUD = "AUD"
 	BRL = "BRL"
@@ -72,8 +70,6 @@ var Currencies = []string{
 	CHF,
 	ISK,
 	NOK,
-	HRK,
-	RUB,
 	TRY,
 	AUD,
 	BRL,
